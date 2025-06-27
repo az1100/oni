@@ -1,0 +1,14 @@
+{
+  "juego": "Jurassic World Evolution",
+  "modos": [
+    { "nombre": "Dinero Ilimitado", "tecla": "F1" },
+    { "nombre": "Electricidad Ilimitada", "tecla": "F2" },
+    { "nombre": "Recursos Ilimitados", "tecla": "F3" },
+    { "nombre": "Felicidad Máxima", "tecla": "F4" },
+    { "nombre": "Dinosaurs Siempre Felices", "tecla": "F5" },
+    { "nombre": "Clima Estable", "tecla": "F6" },
+    { "nombre": "Tiempo Congelado", "tecla": "F7" },
+    { "nombre": "Investigación Instantánea", "tecla": "F8" },
+    { "nombre": "Sin Tiempo de Espera", "tecla": "F9" }
+  ]
+}
