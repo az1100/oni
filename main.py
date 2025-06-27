@@ -1,99 +1,78 @@
-# OniMod - interfaz estilo WeMod
 import sys, os, json
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QListWidget, QListWidgetItem, QPushButton, QFileDialog, QHBoxLayout, QVBoxLayout, QMessageBox
-from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import Qt
-import keyboard
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QFileDialog, QListWidget, QListWidgetItem, QVBoxLayout, QHBoxLayout, QMessageBox
+from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtCore import QSize
 
-CONFIG_FILE = "trainers.json"
-
-class Trainer:
-    def __init__(self, exe, img, json_file):
-        self.exe = exe
-        self.img = img
-        self.json_file = json_file
-        self.mods = []
-        self.load_json()
-
-    def load_json(self):
-        try:
-            with open(self.json_file, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-                self.mods = data.get("modos", [])
-        except: pass
+SAVE_FILE = "trainers.json"
 
 class OniMod(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("OniMod")
-        self.setGeometry(300, 100, 600, 400)
-        self.trainers = []
-        self.load_config()
-        self.init_ui()
+        self.setWindowTitle("OniMod - Biblioteca de Trainers")
+        self.setGeometry(300, 150, 800, 600)
+        self.setStyleSheet("background-color: #1e1e1e; color: white;")
 
-    def init_ui(self):
-        self.layout = QVBoxLayout(self)
-        self.list = QListWidget()
-        self.list.itemClicked.connect(self.show_mods)
-        self.layout.addWidget(self.list)
+        self.layout = QVBoxLayout()
+        self.setLayout(self.layout)
 
-        self.btn_add = QPushButton("+ Añadir trainer")
+        self.trainerList = QListWidget()
+        self.trainerList.setViewMode(QListWidget.IconMode)
+        self.trainerList.setIconSize(QSize(200, 120))
+        self.trainerList.setResizeMode(QListWidget.Adjust)
+        self.trainerList.setSpacing(15)
+        self.trainerList.setStyleSheet("border: none;")
+        self.trainerList.itemClicked.connect(self.launch_trainer)
+
+        self.layout.addWidget(self.trainerList)
+
+        self.btn_add = QPushButton("+ Agregar trainer")
+        self.btn_add.setStyleSheet("padding: 10px; font-size: 16px;")
         self.btn_add.clicked.connect(self.add_trainer)
         self.layout.addWidget(self.btn_add)
 
-        self.mods_area = QVBoxLayout()
-        self.layout.addLayout(self.mods_area)
-        self.populate_trainers()
-
-    def populate_trainers(self):
-        self.list.clear()
-        for t in self.trainers:
-            name = os.path.basename(t.exe)
-            item = QListWidgetItem(QIcon(t.img), name)
-            self.list.addItem(item)
+        self.trainers = []
+        self.load_trainers()
 
     def add_trainer(self):
-        exe, _ = QFileDialog.getOpenFileName(self, "Seleccionar trainer", "", "Exe Files (*.exe)")
-        img, _ = QFileDialog.getOpenFileName(self, "Seleccionar carátula", "", "Imagenes (*.png *.jpg)")
-        j, _ = QFileDialog.getOpenFileName(self, "Seleccionar JSON", "", "JSON (*.json)")
-        if exe and img and j:
-            t = Trainer(exe, img, j)
-            self.trainers.append(t)
-            self.save_config()
-            self.populate_trainers()
-        else:
-            QMessageBox.warning(self, "Error", "Todos los archivos son necesarios")
+        exe_path, _ = QFileDialog.getOpenFileName(self, "Seleccionar Trainer (.exe)", "", "Ejecutables (*.exe)")
+        if not exe_path:
+            return
 
-    def show_mods(self, item):
-        for i in reversed(range(self.mods_area.count())):
-            self.mods_area.itemAt(i).widget().deleteLater()
-        idx = self.list.currentRow()
-        t = self.trainers[idx]
-        for mod in t.mods:
-            h = QHBoxLayout()
-            lbl = QLabel(mod['nombre'])
-            btn = QPushButton("ON/OFF")
-            btn.clicked.connect(lambda _, key=mod['tecla']: keyboard.send(key))
-            h.addWidget(lbl)
-            h.addStretch()
-            h.addWidget(btn)
-            self.mods_area.addLayout(h)
+        img_path, _ = QFileDialog.getOpenFileName(self, "Seleccionar Imagen (carátula)", "", "Imágenes (*.png *.jpg *.jpeg)")
+        if not img_path:
+            return
 
-    def load_config(self):
-        if os.path.exists(CONFIG_FILE):
-            try:
-                with open(CONFIG_FILE, 'r', encoding='utf-8') as f:
-                    raw = json.load(f)
-                    for o in raw:
-                        self.trainers.append(Trainer(o['exe'], o['img'], o['json']))
-            except: pass
+        name = os.path.basename(exe_path).replace(".exe", "")
+        item = QListWidgetItem(QIcon(img_path), name)
+        item.setData(1000, exe_path)
+        item.setData(1001, img_path)
+        self.trainerList.addItem(item)
 
-    def save_config(self):
-        with open(CONFIG_FILE, 'w', encoding='utf-8') as f:
-            out = [{'exe':t.exe, 'img':t.img, 'json':t.json_file} for t in self.trainers]
-            json.dump(out, f, indent=2)
+        self.trainers.append({"name": name, "exe": exe_path, "img": img_path})
+        self.save_trainers()
 
-if __name__ == "__main__":
+    def launch_trainer(self, item):
+        exe_path = item.data(1000)
+        try:
+            os.startfile(exe_path)
+        except Exception as e:
+            QMessageBox.critical(self, "Error al iniciar trainer", str(e))
+
+    def save_trainers(self):
+        with open(SAVE_FILE, 'w', encoding='utf-8') as f:
+            json.dump(self.trainers, f, indent=2)
+
+    def load_trainers(self):
+        if os.path.exists(SAVE_FILE):
+            with open(SAVE_FILE, 'r', encoding='utf-8') as f:
+                self.trainers = json.load(f)
+                for t in self.trainers:
+                    item = QListWidgetItem(QIcon(t['img']), t['name'])
+                    item.setData(1000, t['exe'])
+                    item.setData(1001, t['img'])
+                    self.trainerList.addItem(item)
+
+if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = OniMod()
     window.show()
