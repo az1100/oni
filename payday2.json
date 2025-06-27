@@ -1,0 +1,13 @@
+{
+  "juego": "PAYDAY 2",
+  "modos": [
+    { "nombre": "Salud ilimitada", "tecla": "F1" },
+    { "nombre": "Resistencia ilimitada", "tecla": "F2" },
+    { "nombre": "Máscara instantánea", "tecla": "F3" },
+    { "nombre": "Armadura ilimitada", "tecla": "F4" },
+    { "nombre": "Super Salto (Mientras corres)", "tecla": "F5" },
+    { "nombre": "Sin daño por caída", "tecla": "F6" },
+    { "nombre": "Sin penalización de movimiento", "tecla": "F7" },
+    { "nombre": "A prueba de choques", "tecla": "F8" }
+  ]
+}
