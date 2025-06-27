@@ -20,7 +20,8 @@ jobs:
       run: pip install pyinstaller PyQt5 keyboard
 
     - name: Build EXE
-      run: pyinstaller --name OniMod --onefile --windowed main.py
+      run: pyinstaller --name OniMod --onefile --windowed --icon=onimod.ico main.py
+
 
 
     - name: Upload EXE
