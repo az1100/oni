@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import (
     QFileDialog, QListWidget, QListWidgetItem, QHBoxLayout,
     QMessageBox, QMenu
 )
-from PyQt5.QtGui import QPixmap, QIcon
+from PyQt5.QtGui import QPixmap, QIcon, QPainter
 from PyQt5.QtCore import Qt, QSize, QPoint
 
 CONFIG_FILE = "trainers.json"
@@ -23,12 +23,20 @@ class OniMod(QWidget):
 
         self.layout = QVBoxLayout(self)
 
+        self.logo_label = QLabel()
+        self.logo_label.setPixmap(QPixmap("onimod_icon_transparent.ico").scaled(32, 32, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        self.logo_label.setFixedSize(36, 36)
+        self.layout.addWidget(self.logo_label, alignment=Qt.AlignLeft)
+
         self.list_widget = QListWidget()
         self.list_widget.setViewMode(QListWidget.IconMode)
         self.list_widget.setIconSize(QSize(ICON_SIZE, ICON_SIZE))
         self.list_widget.setResizeMode(QListWidget.Adjust)
         self.list_widget.setSpacing(20)
         self.list_widget.setMovement(QListWidget.Static)
+        self.list_widget.setWrapping(True)
+        self.list_widget.setFlow(QListWidget.LeftToRight)
+        self.list_widget.setGridSize(QSize(180, 160))
         self.list_widget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.list_widget.customContextMenuRequested.connect(self.open_context_menu)
         self.list_widget.itemDoubleClicked.connect(self.launch_trainer)
