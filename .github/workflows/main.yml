@@ -20,11 +20,13 @@ jobs:
       run: pip install pyinstaller PyQt5 keyboard
 
     - name: Build EXE
-      run: pyinstaller --onefile --windowed main.py
+      run: pyinstaller --name OniMod --onefile --windowed main.py
+
 
     - name: Upload EXE
       uses: actions/upload-artifact@v4
 
       with:
         name: OniMod
-        path: dist/main.exe
+        path: dist/OniMod.exe
+
