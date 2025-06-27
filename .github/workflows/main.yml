@@ -1,0 +1,29 @@
+name: Build OniMod EXE
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: pip install pyinstaller PyQt5 keyboard
+
+    - name: Build EXE
+      run: pyinstaller --onefile --windowed main.py
+
+    - name: Upload EXE
+      uses: actions/upload-artifact@v2
+      with:
+        name: OniMod
+        path: dist/main.exe
